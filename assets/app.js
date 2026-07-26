@@ -21,6 +21,39 @@
     memory: `<svg viewBox="0 0 8 8" width="18" height="18"><rect x="0" y="1" width="8" height="5" fill="var(--acc-ram)"/><rect x="1" y="6" width="1" height="1" fill="var(--acc-ram)"/><rect x="3" y="6" width="1" height="1" fill="var(--acc-ram)"/><rect x="5" y="6" width="1" height="1" fill="var(--acc-ram)"/><rect x="1" y="2" width="1" height="3" fill="#100e1b"/><rect x="3" y="2" width="1" height="3" fill="#100e1b"/><rect x="5" y="2" width="1" height="3" fill="#100e1b"/></svg>`,
   };
 
+  // Ícones pixel-art do botão de tema (usam currentColor, herdam a cor do botão).
+  const SUN_ICON = `<svg viewBox="0 0 8 8" width="14" height="14"><rect x="3" y="3" width="2" height="2" fill="currentColor"/><rect x="3" y="0" width="2" height="1" fill="currentColor"/><rect x="3" y="7" width="2" height="1" fill="currentColor"/><rect x="0" y="3" width="1" height="2" fill="currentColor"/><rect x="7" y="3" width="1" height="2" fill="currentColor"/><rect x="1" y="1" width="1" height="1" fill="currentColor"/><rect x="6" y="1" width="1" height="1" fill="currentColor"/><rect x="1" y="6" width="1" height="1" fill="currentColor"/><rect x="6" y="6" width="1" height="1" fill="currentColor"/></svg>`;
+  const MOON_ICON = `<svg viewBox="0 0 8 8" width="14" height="14"><rect x="3" y="0" width="3" height="1" fill="currentColor"/><rect x="2" y="1" width="1" height="1" fill="currentColor"/><rect x="6" y="1" width="1" height="1" fill="currentColor"/><rect x="1" y="2" width="1" height="4" fill="currentColor"/><rect x="7" y="2" width="1" height="1" fill="currentColor"/><rect x="2" y="6" width="1" height="1" fill="currentColor"/><rect x="6" y="6" width="1" height="1" fill="currentColor"/><rect x="3" y="7" width="3" height="1" fill="currentColor"/><rect x="7" y="4" width="1" height="1" fill="currentColor"/></svg>`;
+
+  const THEME_KEY = "rs-theme";
+
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  }
+
+  function updateThemeButton(theme) {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    btn.innerHTML = theme === "light"
+      ? `${MOON_ICON}<span>Escuro</span>`
+      : `${SUN_ICON}<span>Claro</span>`;
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* localStorage indisponível, tudo bem */ }
+    updateThemeButton(theme);
+  }
+
+  function wireTheme() {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    updateThemeButton(currentTheme());
+    btn.addEventListener("click", () => {
+      applyTheme(currentTheme() === "dark" ? "light" : "dark");
+    });
+  }
+
   const UNCONFIRMED_VALUES = new Set(["não confirmado", "nao confirmado", "—", "não aplicável", "nao aplicavel", ""]);
 
   function isEmptyValue(v) {
@@ -521,6 +554,7 @@
     if (!DATA) {
       document.getElementById("grid").innerHTML =
         `<div class="empty">Não foi possível carregar assets/data.js.<br>Rode <code>python3 build.py</code> para gerá-lo a partir da planilha.</div>`;
+      wireTheme();
       return;
     }
     renderStats();
@@ -528,6 +562,7 @@
     wireToolbar();
     wireModal();
     wireLightbox();
+    wireTheme();
     runBoot();
   });
 })();
