@@ -23,8 +23,8 @@ const CATALOG_DATA = {
       "Estado": "Não testada",
       "Detalhamento técnico / observações": "Fotos físicas: anexos 1–3; chipset SiS 964 visível no anexo 2.",
       "Fonte": "Anexos 1–3",
-      "Imagem": "MB-001.jpg",
-      "Manual": "MB-001.pdf"
+      "Imagem": "",
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-002",
@@ -49,7 +49,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "Cadastro anterior do projeto; fotos/HWiNFO detalhado não aparecem no documento recebido.",
       "Fonte": "Cadastro anterior",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-003",
@@ -74,7 +74,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "Segunda unidade física; não deve ser confundida com a MB-002.",
       "Fonte": "Cadastro anterior",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-004",
@@ -99,7 +99,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "HWiNFO: CPU E7500, 45 nm, stepping R0, Wolfdale-M, SSPEC SLGTE, 2c/2t, 2,93 GHz, L2 3 MB, TDP 65 W. Memória Micron 8JTF25664AZ-1G4D1, 2 GB por módulo, DDR3-1332/PC3-10700, 1,50 V. GPU integrada Intel GMA 4500.",
       "Fonte": "Anexos 4–8 e 9–14",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-005",
@@ -124,7 +124,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "Cadastro anterior do projeto; sem HWiNFO identificável no documento recebido.",
       "Fonte": "Cadastro anterior",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-006",
@@ -149,7 +149,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "Cadastro anterior do projeto; CPU integrada à placa.",
       "Fonte": "Cadastro anterior",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-007",
@@ -174,7 +174,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "Cadastro anterior do projeto; CPU integrada à placa.",
       "Fonte": "Cadastro anterior",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     },
     {
       "Código": "MB-008",
@@ -199,7 +199,7 @@ const CATALOG_DATA = {
       "Detalhamento técnico / observações": "CPU E2160: Conroe-1M, stepping M0, SSPEC SLA8Z, 65 nm, 2c/2t, 1,80 GHz, FSB 800, L2 1 MB, TDP 65 W. RAM: Samsung M3 78T2953EZ3-CE6 1 GB PC2-5300 + Smart Modular SG564288FG8N6KF-Z1 1 GB PC2-6400. Vídeo integrado Intel GMA 3000. Placa física também mostra DP/N BR-0CT103-48105-76G-0770 Rev. A04 em outra etiqueta; manter ambas as identificações até reconciliação física.",
       "Fonte": "Anexos 15–30",
       "Imagem": "",
-      "Manual": ""
+      "Manual (URL)": ""
     }
   ],
   "gpus": [

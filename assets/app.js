@@ -373,6 +373,14 @@
     const manualBox = document.getElementById(`media-manual-${code}`);
     const manualHref = resolveManual(raw, code);
     if (!manualBox) return;
+
+    // Links externos (planilha com URL completa) não dá pra checar com HEAD
+    // por causa de CORS — mostra o link direto, confiando na URL cadastrada.
+    if (manualHref.startsWith("http")) {
+      manualBox.innerHTML = `${SLOT_ICON}<br>Manual técnico<a href="${manualHref}" target="_blank" rel="noopener">Abrir PDF »</a>`;
+      return;
+    }
+
     fetch(manualHref, { method: "HEAD" })
       .then((res) => {
         if (!res.ok) throw new Error("not found");
