@@ -97,36 +97,47 @@ mexer no HTML/CSS/JS para adicionar itens, só na planilha.
 
 ### Adicionar fotos e manuais (sem mexer na planilha)
 
-O site já sabe onde procurar: a foto de um item é sempre `<código>.JPG` dentro
-de `images/`, e o manual é sempre `<código>.PDF` dentro de `manuals/`. Por
-exemplo, para a placa **MB-001**:
+O site já sabe onde procurar. Cada item pode ter **várias fotos** — a foto
+número N do item é sempre `<código>-N.JPG` dentro de `images/`, e o manual é
+sempre `<código>.PDF` dentro de `manuals/`. Por exemplo, para a placa
+**MB-001** com três fotos:
 
-- `images/MB-001.JPG`
+- `images/MB-001-1.JPG`
+- `images/MB-001-2.JPG`
+- `images/MB-001-3.JPG`
 - `manuals/MB-001.PDF`
 
-Só isso — não precisa criar coluna nenhuma na planilha nem rodar `build.py`
-de novo (fotos/manuais não fazem parte do `data.js`, o navegador procura o
-arquivo na hora). Basta colocar o arquivo com o nome certo na pasta certa e
-atualizar/recarregar a página.
+Pode ter só 1 foto, 5 fotos, ou nenhuma — o site procura de `-1` até `-8` e só
+mostra as que existirem de fato. Não precisa criar coluna na planilha nem
+rodar `build.py` de novo (fotos/manuais não fazem parte do `data.js`, o
+navegador procura o arquivo na hora). Basta colocar os arquivos com o nome
+certo na pasta certa e recarregar a página.
 
-Se os seus arquivos vierem com outra extensão ou caixa (ex.: `.jpg` minúsculo,
-ou `.png`), abra `assets/app.js` e ajuste as duas constantes no topo da seção
-"Convenção de nomes":
+Na ficha do item, as fotos aparecem como miniaturas lado a lado — **clique em
+qualquer uma para abrir em tela cheia (zoom)**, com setas para navegar entre
+as fotos daquele item, contador de posição, e fecha com `Esc`, clicando fora
+ou no `✕`.
+
+Se precisar de mais de 8 fotos por item, ou os arquivos vierem com outra
+extensão/caixa (ex.: `.jpg` minúsculo, ou `.png`), abra `assets/app.js` e
+ajuste as constantes no topo da seção "Convenção de nomes":
 
 ```js
 const IMAGE_EXT = "JPG";
 const MANUAL_EXT = "PDF";
+const MAX_PHOTOS = 8;
 ```
 
 Itens sem foto ou manual ainda cadastrado aparecem com um aviso discreto no
 lugar, sem quebrar o layout — e o site detecta sozinho quando você adiciona
 o arquivo depois.
 
-**Caso especial:** se algum item tiver uma foto ou manual com nome diferente
-do código (ou um manual hospedado em outro site), ainda dá para forçar isso
-pela planilha: adicione uma coluna **`Imagem`** ou **`Manual (URL)`** na aba
+**Caso especial:** se quiser incluir uma foto extra com nome fora do padrão
+(ou hospedada em outro site), ou um manual com nome diferente do código,
+ainda dá pra forçar isso pela planilha: adicione uma coluna **`Imagem`** (ela
+entra como uma foto a mais, além das numeradas) ou **`Manual (URL)`** na aba
 do item, preencha com o nome do arquivo ou uma URL completa, e rode
-`python3 build.py`. Isso tem prioridade sobre a convenção automática.
+`python3 build.py`.
 
 ## Sobre o design
 

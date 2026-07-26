@@ -238,23 +238,20 @@
 
   const SLOT_ICON = `<svg viewBox="0 0 8 8" width="20" height="20" style="margin-bottom:6px"><rect x="0" y="0" width="2" height="1" fill="currentColor"/><rect x="0" y="0" width="1" height="2" fill="currentColor"/><rect x="6" y="0" width="2" height="1" fill="currentColor"/><rect x="7" y="0" width="1" height="2" fill="currentColor"/><rect x="0" y="6" width="1" height="2" fill="currentColor"/><rect x="0" y="7" width="2" height="1" fill="currentColor"/><rect x="7" y="6" width="1" height="2" fill="currentColor"/><rect x="6" y="7" width="2" height="1" fill="currentColor"/></svg>`;
 
-  // Convenção de nomes: por padrão a foto de um item é <código>.JPG e o
-  // manual é <código>.PDF (ex.: MB-001.JPG, MB-001.PDF), sem precisar
-  // mexer na planilha. Se os seus arquivos usarem outra extensão/caixa,
-  // troque as constantes abaixo.
+  // Convenção de nomes: a foto N de um item é <código>-N.JPG (1, 2, 3...)
+  // e o manual é <código>.PDF (ex.: MB-001-1.JPG, MB-001-2.JPG, MB-001.PDF),
+  // sem precisar mexer na planilha. Se os seus arquivos usarem outra
+  // extensão/caixa, troque as constantes abaixo. MAX_PHOTOS é só o teto de
+  // quantas fotos o site tenta procurar por item — pode ter menos, sem
+  // problema (as que não existirem simplesmente não aparecem).
   const IMAGE_EXT = "JPG";
   const MANUAL_EXT = "PDF";
+  const MAX_PHOTOS = 8;
 
-  // A planilha ainda pode sobrescrever o padrão, se quiser: preencha a
-  // coluna "Imagem" ou "Manual (URL)" do item com um nome de arquivo
-  // diferente ou uma URL completa (https://...).
-  function resolveImage(raw, code) {
-    const custom = raw["Imagem"];
-    if (!isEmptyValue(custom)) {
-      return String(custom).startsWith("http") ? custom : `images/${custom}`;
-    }
-    return `images/${code}.${IMAGE_EXT}`;
-  }
+  // A planilha ainda pode sobrescrever/completar o padrão, se quiser:
+  // preencha a coluna "Imagem" do item com um nome de arquivo extra (ou
+  // URL completa) para incluir como foto adicional, e "Manual (URL)" para
+  // um manual com nome diferente ou hospedado em outro site.
   function resolveManual(raw, code) {
     const custom = raw["Manual (URL)"];
     if (!isEmptyValue(custom)) {
@@ -263,42 +260,139 @@
     return `manuals/${code}.${MANUAL_EXT}`;
   }
 
-  function mediaBoxHTML(raw, code) {
-    const imgSrc = resolveImage(raw, code);
-    return `<div class="media-row">
-      <div class="media-box" id="media-photo-${code}">
-        <img src="${imgSrc}" alt="Foto de ${code}" data-photo-code="${code}">
+  function photoCandidates(raw, code) {
+    const list = [];
+    const custom = raw["Imagem"];
+    if (!isEmptyValue(custom)) {
+      list.push(String(custom).startsWith("http") ? custom : `images/${custom}`);
+    }
+    for (let n = 1; n <= MAX_PHOTOS; n++) {
+      list.push(`images/${code}-${n}.${IMAGE_EXT}`);
+    }
+    return list;
+  }
+
+  function galleryHTML(raw, code) {
+    const galleryId = `gallery-${code}`;
+    const candidates = photoCandidates(raw, code);
+    const thumbs = candidates
+      .map((src, idx) => `
+        <div class="thumb" data-idx="${idx}" style="display:none">
+          <img src="${src}" data-idx="${idx}" alt="Foto ${idx + 1} de ${code}">
+        </div>`)
+      .join("");
+    return `<div class="gallery" id="${galleryId}">
+      <div class="gallery-empty" id="${galleryId}-empty" style="display:none">
+        ${SLOT_ICON}<br>Nenhuma foto cadastrada ainda<br>
+        <span style="opacity:.7">(coloque ${code}-1.${IMAGE_EXT}, ${code}-2.${IMAGE_EXT}... em images/)</span>
       </div>
+      <div class="gallery-grid">${thumbs}</div>
+    </div>`;
+  }
+
+  function manualBoxHTML(code) {
+    return `<div class="media-row">
       <div class="media-box" id="media-manual-${code}">
         ${SLOT_ICON}<br>verificando manual...
       </div>
     </div>`;
   }
 
-  // Roda depois que o HTML do modal já está no DOM: trata o caso da foto
-  // não existir (evento "error" da <img>) e checa se o manual existe de
-  // fato (HEAD request) antes de mostrar o link de download.
-  function wireMedia(raw, code) {
-    const photoBox = document.getElementById(`media-photo-${code}`);
-    const img = photoBox ? photoBox.querySelector("img") : null;
-    if (img) {
-      img.addEventListener("error", () => {
-        photoBox.innerHTML = `${SLOT_ICON}<br>Foto ainda não cadastrada<br><span style="opacity:.7">(coloque ${code}.${IMAGE_EXT} em images/)</span>`;
-      }, { once: true });
+  // Roda depois que o HTML do modal já está no DOM.
+  function wireGallery(raw, code) {
+    const galleryId = `gallery-${code}`;
+    const root = document.getElementById(galleryId);
+    if (!root) return;
+    const emptyEl = document.getElementById(`${galleryId}-empty`);
+    const thumbs = [...root.querySelectorAll(".thumb")];
+    let pending = thumbs.length;
+    let loadedCount = 0;
+
+    function checkAllDone() {
+      pending--;
+      if (pending === 0 && loadedCount === 0 && emptyEl) {
+        emptyEl.style.display = "";
+      }
     }
 
+    thumbs.forEach((thumbEl) => {
+      const img = thumbEl.querySelector("img");
+      img.addEventListener("load", () => {
+        thumbEl.style.display = "";
+        loadedCount++;
+        thumbEl.addEventListener("click", () => {
+          const orderedSrcs = thumbs
+            .filter((t) => t.style.display !== "none")
+            .map((t) => t.querySelector("img").getAttribute("src"));
+          const pos = orderedSrcs.indexOf(img.getAttribute("src"));
+          openLightbox(orderedSrcs, pos);
+        });
+        checkAllDone();
+      }, { once: true });
+      img.addEventListener("error", () => {
+        thumbEl.remove();
+        checkAllDone();
+      }, { once: true });
+    });
+  }
+
+  function wireManualBox(raw, code) {
     const manualBox = document.getElementById(`media-manual-${code}`);
     const manualHref = resolveManual(raw, code);
-    if (manualBox) {
-      fetch(manualHref, { method: "HEAD" })
-        .then((res) => {
-          if (!res.ok) throw new Error("not found");
-          manualBox.innerHTML = `${SLOT_ICON}<br>Manual técnico<a href="${manualHref}" target="_blank" rel="noopener">Abrir PDF »</a>`;
-        })
-        .catch(() => {
-          manualBox.innerHTML = `${SLOT_ICON}<br>Manual ainda não cadastrado<br><span style="opacity:.7">(coloque ${code}.${MANUAL_EXT} em manuals/)</span>`;
-        });
-    }
+    if (!manualBox) return;
+    fetch(manualHref, { method: "HEAD" })
+      .then((res) => {
+        if (!res.ok) throw new Error("not found");
+        manualBox.innerHTML = `${SLOT_ICON}<br>Manual técnico<a href="${manualHref}" target="_blank" rel="noopener">Abrir PDF »</a>`;
+      })
+      .catch(() => {
+        manualBox.innerHTML = `${SLOT_ICON}<br>Manual ainda não cadastrado<br><span style="opacity:.7">(coloque ${code}.${MANUAL_EXT} em manuals/)</span>`;
+      });
+  }
+
+  // ---------- lightbox (zoom nas fotos) ----------
+  let lightboxState = { srcs: [], index: 0 };
+
+  function updateLightbox() {
+    const { srcs, index } = lightboxState;
+    document.getElementById("lightbox-img").src = srcs[index];
+    document.getElementById("lightbox-counter").textContent = `${index + 1} / ${srcs.length}`;
+    const showNav = srcs.length > 1;
+    document.getElementById("lightbox-prev").style.display = showNav ? "" : "none";
+    document.getElementById("lightbox-next").style.display = showNav ? "" : "none";
+  }
+
+  function openLightbox(srcs, index) {
+    if (!srcs.length) return;
+    lightboxState = { srcs, index: Math.max(0, index) };
+    updateLightbox();
+    document.getElementById("lightbox").classList.remove("hidden");
+  }
+
+  function closeLightbox() {
+    document.getElementById("lightbox").classList.add("hidden");
+  }
+
+  function navLightbox(delta) {
+    const { srcs } = lightboxState;
+    lightboxState.index = (lightboxState.index + delta + srcs.length) % srcs.length;
+    updateLightbox();
+  }
+
+  function wireLightbox() {
+    document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+    document.getElementById("lightbox-prev").addEventListener("click", () => navLightbox(-1));
+    document.getElementById("lightbox-next").addEventListener("click", () => navLightbox(1));
+    document.getElementById("lightbox").addEventListener("click", (e) => {
+      if (e.target.id === "lightbox") closeLightbox();
+    });
+    document.addEventListener("keydown", (e) => {
+      const lb = document.getElementById("lightbox");
+      if (lb.classList.contains("hidden")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") navLightbox(-1);
+      if (e.key === "ArrowRight") navLightbox(1);
+    });
   }
 
   function openModal(code, type) {
@@ -315,7 +409,11 @@
       <h2>${item.title}</h2>
       <div class="kicker">${item.kicker}</div>
 
-      ${mediaBoxHTML(item.raw, item.code)}
+      <div class="section-title">Fotos</div>
+      ${galleryHTML(item.raw, item.code)}
+
+      <div class="section-title">Manual técnico</div>
+      ${manualBoxHTML(item.code)}
 
       <div class="section-title">Ficha técnica</div>
       ${specTableHTML(item.raw)}
@@ -369,7 +467,8 @@
     body.querySelectorAll("[data-open]").forEach((el) => {
       el.addEventListener("click", () => openModal(el.getAttribute("data-open"), el.getAttribute("data-type")));
     });
-    wireMedia(item.raw, item.code);
+    wireGallery(item.raw, item.code);
+    wireManualBox(item.raw, item.code);
 
     overlay.classList.remove("hidden");
   }
@@ -428,6 +527,7 @@
     renderGrid();
     wireToolbar();
     wireModal();
+    wireLightbox();
     runBoot();
   });
 })();
