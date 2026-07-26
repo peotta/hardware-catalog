@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RETRO//STACK — Catálogo Técnico de Hardware</title>
+<meta name="description" content="Catálogo técnico de uma coleção de hardware retrô: placas-mãe, processadores, placas de vídeo e memórias.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 8 8%22><rect width=%228%22 height=%228%22 fill=%22%2312101c%22/><rect x=%221%22 y=%221%22 width=%222%22 height=%222%22 fill=%22%237c5cff%22/><rect x=%224%22 y=%221%22 width=%222%22 height=%222%22 fill=%22%234fd6ff%22/><rect x=%221%22 y=%224%22 width=%222%22 height=%222%22 fill=%22%23ff5d8f%22/><rect x=%224%22 y=%224%22 width=%222%22 height=%222%22 fill=%22%237cff6b%22/></svg>">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="pixel-bg"></div>
+
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-logo">RETRO<span>//</span>STACK</div>
+      <div class="boot-bar"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+      <div class="boot-label" id="boot-label">carregando catálogo...</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Coleção pessoal · desde 2004</p>
+      <h1 class="title">RETRO<span class="title-slash">//</span>STACK</h1>
+      <p class="subtitle">
+        Catálogo técnico da coleção — placas-mãe, processadores, placas de vídeo e memórias,
+        documentados com specs completas, histórico de testes e diagnóstico.
+        <b>Atualizado direto da planilha</b> a cada novo item.
+      </p>
+
+      <div class="stats" id="stats"></div>
+      <div class="status-strip" id="status-strip"></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <div class="search">
+          <svg class="search-icon" viewBox="0 0 8 8" width="14" height="14"><rect x="1" y="1" width="3" height="1" fill="currentColor"/><rect x="1" y="2" width="1" height="3" fill="currentColor"/><rect x="4" y="2" width="1" height="1" fill="currentColor"/><rect x="1" y="5" width="3" height="1" fill="currentColor"/><rect x="4" y="1" width="1" height="1" fill="currentColor"/><rect x="5" y="5" width="1" height="1" fill="currentColor"/><rect x="6" y="6" width="2" height="1" fill="currentColor"/><rect x="6" y="7" width="1" height="1" fill="currentColor"/></svg>
+          <input id="search-input" type="text" placeholder="buscar por código, fabricante, modelo, chipset...">
+        </div>
+        <div class="chips">
+          <span class="chip active" data-cat="all">Todos</span>
+          <span class="chip" data-cat="motherboards">Placas-mãe</span>
+          <span class="chip" data-cat="gpus">Placas de vídeo</span>
+          <span class="chip" data-cat="cpus">Processadores</span>
+          <span class="chip" data-cat="memory">Memórias</span>
+        </div>
+      </div>
+      <p class="count-note" id="count-note"></p>
+    </div>
+
+    <main class="grid" id="grid"></main>
+
+    <footer>
+      <span>RETRO//STACK — catálogo gerado a partir de <span class="glow">catalogo.xlsx</span></span>
+      <span>Dados sem evidência marcados como "Não confirmado" — nenhuma lacuna é preenchida por suposição.</span>
+    </footer>
+  </div>
+
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

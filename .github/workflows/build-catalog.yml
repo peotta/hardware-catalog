@@ -1,0 +1,50 @@
+name: Build catálogo
+
+# Sempre que catalogo.xlsx (ou build.py) for atualizado e enviado ao GitHub,
+# este workflow roda build.py sozinho no servidor do GitHub, gera o novo
+# assets/data.js e faz commit dele de volta no repositório. O GitHub Pages
+# então republica o site automaticamente com os dados novos.
+#
+# Ou seja: depois de configurado, atualizar o catálogo vira só isto:
+#   1. editar catalogo.xlsx
+#   2. git add catalogo.xlsx
+#   3. git commit -m "Atualiza catálogo"
+#   4. git push
+# Sem precisar rodar build.py na sua máquina.
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - "catalogo.xlsx"
+      - "build.py"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Instalar dependências
+        run: pip install openpyxl
+
+      - name: Rodar build.py
+        run: python3 build.py
+
+      - name: Commitar assets/data.js se mudou
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/data.js
+          git diff --cached --quiet || git commit -m "Atualiza catálogo automaticamente [skip ci]"
+          git push
