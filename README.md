@@ -147,3 +147,9 @@ categoria (amarelo/placas-mãe, rosa/GPUs, ciano/CPUs, verde/memórias),
 uma tela de abertura com barra de loading — tudo dentro de um grid moderno,
 responsivo, com busca/filtros instantâneos. CSS puro, sem dependências
 externas além de duas fontes do Google Fonts.
+
+---
+
+## Uso de Inteligência Artificial
+
+Em conformidade com a Política de Uso Responsável da IA da FT/UnB, declara-se que este material foi elaborado com apoio de ferramentas de inteligência artificial generativa (Claude, ChatGPT e Gemini), sob revisão e responsabilidade do professor.
